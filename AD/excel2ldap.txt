@@ -1,0 +1,125 @@
+excel2ldap															  excel2ldap
+
+NAME
+	excel2ldap
+	
+AUFRUF
+	cscript excel2ldap.vbs 
+		-s[ource] <sourcefile> 
+		[-t[arget] <targetfile>] 
+		[-r[ow] <startrow>] 
+		[-dn <dn>] 
+		[-do[main] <domain>] 
+		[[-]?]
+
+BESCHREIBUNG
+	excel2ldap ist der erste von insgesamt zwei Schritten zur automatisierten
+	Anlage und Verwaltung von Projekt-Benutzern im AD. excel2ldap erhält als
+	Input den Pfad zu einer standardisierten MS Excel-Datei und generiert daraus
+	Teilstrings in LDAP-Syntax, die von ldap2user weiter verarbeitet werden.
+	Die aus der Excel-Datei ausgelesenen Felder sind:
+	Nachname, Vorname, Land/Region, Firma, Abteilung, Position, E-Mail Adresse, 
+	Rufnummer, Fax, CMS Groups Reader, CMS Groups Editor, WSS Teamroom Reader, 
+	WSS Teamroom Editor, UserID, DeleteFromGroups, Action.
+	Die beiden Felder UserID und DeleteFromGroups sind nur gefüllt, wenn der 
+	zu bearbeitende Account	bereits existiert; das Feld DeleteFromGroups gibt
+	die Namen der Groups an, aus denen der Account unter "UserID" entfernt 
+	werden soll. Die Felder CMS Groups Reader bis WSS Teamroom Editor geben die 
+	Namen der Gruppen an, in die der betroffene User neu aufgenommen werden 
+	soll. Das Action-Feld legt fest, ob der jeweilige Account neu angelegt 
+	(Inhalt "N"), überarbeitet ("C") oder gelöscht ("D") werden soll.
+	
+	Die Ausgabe sieht i.A. so aus (alles in einer Zeile):
+		displayName:Name##cn:##userPrincipalName:@user.domain.company##
+		sAMAccountName:##sn:Doe##givenName:Jane##co:Belgium##
+		company:Contoso##department:Finance##title:Secretary/Assistent##
+		mail:jane.doe@company.be##telephoneNumber:+32 2 123-456##
+		facsimileTelephoneNumber:+32 2 123-123##memberOf:CN=AD_Group1,
+		OU=Groups,OU=COMPANY,OU=Customers,DC=user,DC=domain,
+		DC=company;CN=AD_Group2,OU=Groups,
+		OU=COMPANY,OU=Customers,DC=user,DC=domain,DC=company;
+		CN=AD_Group3,OU=Groups,OU=COMPANY,
+		OU=Customers,DC=user,DC=domain,DC=company##noMemberOf:CN=N,
+		OU=Groups,OU=COMPANY,OU=Customers,DC=user,DC=domain,
+		DC=company##action:##password: ##description:na
+ 
+	Die Ausgabe von excel2ldap dient anschließend als Eingabe für ldap2user.
+	
+	Eine aktuelle Version von excel2ldap befindet sich in 
+	\\server\path
+	
+PARAMETER
+		-s[ource] <sourcefile> 
+			Dieser obligatorische Parameter legt den vollständigen Dateipfad 
+			der Excel-Datei fest.
+			
+		[-t[arget] <targetfile>] 
+			Dieser optionale Parameter legt den Namen der Ausgabedatei fest
+			(Default: STDOUT)
+			
+		[-r[ow] <startrow>] 
+			Dieser optionale Parameter legt die Zeile in der Excel-Datei fest,
+			ab der Daten eingelesen werden sollen. Dieser Wert darf nicht kleiner
+			als 3 (Default) sein.
+			
+		[-dn <dn>] 
+			Dieser optionale Parameter legt den organisatorischen DN fest. 
+			(Default: OU=Groups,OU=COMPANY,OU=Customers,DC=user,
+			DC=domain,DC=company
+			
+		[-do[main] <domain>] 
+			Dieser optionale Parameter legt die Domain fest. Default:
+			user.domain.company
+			
+		[[-]?]
+			Dieser optionale Parameter führt zur Anzeige der Hilfe mit einer 
+			Übersicht über alle Parameter.
+			
+ABHÄNGIGKEITEN
+	excel2ldap erfordert Windows NT (oder höher) und den Windows Scripting Host. 
+	Ferner ist ein lokal installiertes MS Excel 2000 (oder höher) notwendig, da
+	das ActiveX-Control "Excel.Application" benötigt wird.
+	
+BEISPIELE
+	Lies Excel-Datei e:\Exceldatei.xls ab Zeile 3 und schreibe Ergebnisse nach
+	e:\Useranlage_2005-05-05.txt:
+	cscript excel2ldap.vbs 
+		-s e:\Exceldatei.xls 
+		-t e:\Useranlage_2005-05-05.txt 
+		-r 3
+
+	Lies Excel-Datei e:\ein Verzeichnis\Exceldatei.xls und schreibe Ergebnisse 
+	nach e:\ein anderes Verzeichnis\Useranlage_2005-05-05.txt:
+	cscript excel2ldap.vbs 
+		-s "e:\ein Verzeichnis\Exceldatei.xls" 
+		-t "e:\ein anderes Verzeichnis\Useranlage_2005-05-05.txt"
+	Achtung: bei Pfaden mit Blanks diese in "" setzen.
+
+WARNUNGEN
+	excel2ldap gibt eine Vielzahl von Warnungen und Fehlermeldungen aus, falls
+	Probleme auftauchen. Diese sind i.d.R. selbsterklärend:
+	
+	invalid input data (<parameter name>). 
+		Diese Meldung erscheint bei einem Fehler in der Liste übergebener
+		Parameter. Die Ausführung des Programms wird abgebrochen.
+	missing sourcefile. 
+		Diese Meldung erscheint bei fehlender Angabe einer Excel-Datei 
+		(Parameter "-s"). Die Ausführung des Programms wird abgebrochen.
+	input file does not exist.
+		Diese Meldung erscheint, falls die mit "-s" spezifizierte Excel-Datei
+		nicht existiert. Die Ausführung des Programms wird abgebrochen.
+	No Excel present here.
+		Diese Meldung erscheint bei nicht installiertem Excel.Application-
+		ActiveX-Control. Die Ausführung des Programms wird abgebrochen.
+	Can't write into <Ausgabedatei>: <Fehlerursache>
+		Diese Meldung erscheint, falls nicht nach <Ausgabedatei> geschrieben 
+		werden kann. Der Grund erscheint im Anschluß. Die Ausführung des 
+		Programms wird abgebrochen.
+	
+	Weitere Fehler, die nicht abgefangen werden, bitte den Autoren melden.
+	
+AUTOR
+	Code M. Berndtgen, 2005. Dokumentation M. Berndtgen
+	
+SIEHE AUCH
+	cscript, ldap2user

@@ -1,0 +1,20 @@
+set node [lindex $argv 0]
+
+set appserverFile {appservers.txt}
+set af [open $appserverFile a+]
+set mbStr [$AdminControl queryNames type=Server,node=$node,*]
+set mbList [split $mbStr $env(line.separator)]
+
+foreach item $mbList {
+	if { $item != "" } { 
+		puts stdout $item
+		if [
+			regexp -nocase {^[^:]*:name=([^,]*).*} $item {\1} appservername
+		] then {
+			puts $af "$appservername" 
+		} else {
+			puts "no match"
+		}
+	}
+}
+close $af

@@ -1,0 +1,93 @@
+cmsexport															   cmsexport
+
+NAME
+	cmsexport
+	
+AUFRUF
+	cscript cmsexport.vbs 
+		-u[ser] <username> 
+		-p[assword] <password> 
+		-c[hannel] <channel>
+		-t <target file>
+		[-irg {1|2|3}] 
+		[-icb {1|2}] 
+		[[-]?]
+
+BESCHREIBUNG
+
+	cmsexport exportiert Microsoft Content Management Server (MCMS) Channelstrukturen
+	(inkl. Postings) in Site Manager-SDO-Exportdateien. API-bedingt handelt es sich
+	dabei um einen Delta-Export. d.h. es werden nur die Container und Postings expor-
+	tiert, die seit dem letzten Export modifiziert / neu angelegt wurden. 
+	Das Handling mit cmsexport entspricht weitgehend dem Export einer SDO-Datei
+	mittels MCMS Site-Manager. Im Anschluß wird der von MCMS erstellte Export-
+	Report in einem Browserfenster angezeigt.
+	
+	cmsexport befindet sich auf server1 im Verzeichnis path.
+
+	Eine aktuelle Version von cmsexport befindet sich in path
+	
+PARAMETER
+		-u <username>
+			Mit diesem Parameter wird der Username spezifiziert, mittels dessen die
+			Authentifizierung am Server erfolgt.
+		
+		-p <password>
+			Mit diesem Parameter wird das Passwort für die Authentifizierung am
+			Server festgelegt.
+			
+		-t <sdofile>
+			Zu erstellende SDO-Datei.
+			
+		[-irg {1|2|3}]
+			Dieser optionale Parameter, der mit den Werten 1, 2 oder 3 belegt werden 
+			kann, legt die "Include Right Groups"-Option fest. Dabei bedeuten:
+			1: Kein Export der User- oder Gruppenberechtigungen (Default)
+'           2: Export der Gruppenberechtigungen 
+'           3: Export der User- und Gruppenberechtigungen 
+		[-icb {1|2}] 
+			Dieser optionale Parameter, der mit den Werten 1 oder 2 belegt werden 
+			kann, legt die "Include Created By"-Option fest. Dabei bedeuten:
+			1: Created By - Information wird nicht importiert.
+			2: Created By - Information wird importiert (Default).
+			
+		[-?]
+			Dieser optionale Parameter führt zur Anzeige der Hilfe mit einer 
+			Übersicht über alle Parameter.
+
+	
+ABHÄNGIGKEITEN
+	cmsexport erfordert Windows NT (oder höher) und den Windows Scripting Host. 
+	Korrekter Ablauf nur bei Zugriff auf einen MCMS-Server und passenden Rechten.
+	
+BEISPIELE
+	Exportiere /Channels/cms/company 
+	cscript cmsexport.vbs -u WinNt://server/Adminuser -p p@ssw0rd 
+			-c /channels/cms/company -t cms.sdo
+	
+FEHLER/WARNUNGEN	
+	cmsexport gibt eine Vielzahl von Warnungen und Fehlermeldungen aus, falls
+	Probleme auftauchen. Diese sind i.d.R. selbsterklärend:
+
+	invalid input data (<parameter name>).	
+		Diese Meldung erscheint bei einem Fehler in der Liste übergebener
+		Parameter. Die Ausführung des Programms wird abgebrochen.
+	Export Problem Creating Deployment Object
+		Diese Meldung erscheint, falls die MCMS-Komponente
+		"CmsDeployServer.CmsDeployExport" nicht referenziert werden kann. 
+		Der Grund erscheint im Anschluß. Die Ausführung des Programms wird 
+		abgebrochen.
+	Export Problem Authenticating the Admin User
+		Diese Meldung erscheint bei fehlgeschlagener Authentifizierung am MCMS-
+		Server. Der Grund erscheint im Anschluß. Die Ausführung des Programms 
+		wird abgebrochen.
+	WARNING: Wrong parameter setting for <parameter name>. Setting 
+	<parameter name> to default value <default>.
+		Diese Warnung erscheint bei unzulässiger Belegung eines der Parameter
+		irg, icb, roa oder ror. Der entsprechende Parameter wird auf seinen
+		Defaultwert gesetzt. Die Ausführung des Programms wird fortgesetzt.
+	Export Problem creating sdo File
+		Diese Meldung erscheint bei fehlgeschlagenem Export der Channel-Struktur.
+		Der Grund erscheint im Anschluß. Die Ausführung des Programms wird 
+		abgebrochen.
+	

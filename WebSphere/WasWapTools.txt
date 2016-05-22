@@ -1,0 +1,84 @@
+WAS WAP Tools
+
+AUFRUF
+
+	testrun.cmd
+	
+	cscript listRunningServers.vbs 
+		-s[erver] <server> 
+		-e[nvironment] {T|A|P}
+		-p[ort] <portnumber>
+		-u[serinfo] "<userinfo>"
+		[-v[erbose]]
+		-c[conf[iguration]] <configfile>
+		[-?]
+		
+	cscript AppServerControl.vbs
+		-f[ile] <serverfile>
+		-m[ode] {start|stop}
+		[-v[erbose]]]
+		-t[erminate]
+		[-?]
+		
+	wasnodes.conf
+	
+	
+BESCHREIBUNG
+
+	Die WAS WAP Tools ermöglichen das geregelte Herunter- und Wiederhochfahren von Instanzen von Application Servern in einer WebSphere-Cell. Es gibt i.W. zwei Tools: listRunningServers zum Ermitteln der gerade aktiven Application Server in einer Cell und AppServerControl zum gezielten Stoppen und Starten der durch listRunningServers ermittelten Server.
+	
+	
+BESCHREIBUNG testrun
+
+	testrun ist ein Beispielskript zum Ermitteln der aktiven Application Server in allen drei Stages (Test, Abnahme, Produktion) und dem Herunter- und anschließenden Hochfahren der Application Server in der Test-Stage. Der Aufruf geschieht über das Kommando testrun ohne weitere Angabe von Parametern.
+	
+
+BESCHREIBUNG listRunningServers
+
+	listRunningServers.vbs dient dem Ermitteln der aktuell aktiven Application Server in einer gegebenen Stage. Die Parameter werden an wasadmin, das sich mit dem DMGR der jeweiligen Stage verbindet, übergeben und die Rückgabewerte anschließend empfangen. Abschließend werden die laufenden Application Server in eine Textdatei geschrieben, die später von AppServerControl.vbs ausgewertet wird.
+	
+PARAMETER
+
+	-s[erver] <server> - (veraltet). Beliebiger Servername, bleibt für eine spätere Programmversion reserviert.
+	-e[nvironment] {T|A|P} - legt die verwendete Stage fest (T = Test, A = Abnahme, P = Produktion). Muß dann mit den unter -u spezifizierten Werten zusammenpassen.
+	-p[ort] <portnumber> - SOAP Port des WAS DMGR der entsprechenden Stage.
+	-u[serinfo] "<userinfo>" - <userinfo> besteht aus einem String im Format "-user <username> -password <password>" ("" gehören dazu). <username> ist ein hinreichend berechtigter User zum Stoppen und Starten von Application Servern. Der <userinfo>-String wird dem wasadmin-Kommando übergeben.
+	[-v[erbose]] - "verbose" Ausgabe 
+	-c[conf[iguration]] <configfile> - Konfigurationsdatei im <configfile>-Format (Erläuterungen s.u.)
+	[-?] - Aufruf der Hilfe
+
+	
+BESCHREIBUNG AppServerControl
+
+	AppServerControl.vbs stoppt und startet Application Server einer gegebenen Stage / Websphere Cell. Dabei werden die Parameter an die bereits vorhandenen Kommandos startAppServer.cmd und stopServer.cmd übergeben.
+	
+PARAMETER
+
+	-f[ile] <serverfile> - <serverfile> ist eine csv-Datei, die vorher von listRunningServers.vbs erstellt wurde. Das Format ist <servername>;<node>;<cell>
+	-m[ode] {start|stop} - "start" startet die in <serverfile> angegebenen Server, "stop" stoppt sie.
+	[-v[erbose]]] - "verbose" Output
+	-t[erminate] - beendet / terminiert Prozesse, statt sie nur einfach zu stoppen.
+	[-?] - Aufruf der Hilfe
+
+
+BESCHREIBUNG wasnodes.conf
+
+	wasnodes.conf ist die Konfigurationsdatei für listRunningServers.vbs. Sie besteht aus folgenden Einträgen:
+	
+	PROFILEREGISTRY=E:\Program\IBM\WebSphere61\properties\profileRegistry.xml
+	NODESDIR=<profilepath>\config\cells\<cellname>\nodes
+	NODEINFOSCRIPT=e:\Program\WebSphereScripting\Scripts\getNodeInfo.jacl
+	WASADMIN=E:\Program\IBM\WebSphere61\bin\wsadmin.bat -conntype SOAP -host server
+	ACGETNODENAMES="$AdminControl queryNames WebSphere:type=Server,processType=NodeAgent,*"
+	
+	Die in <> stehenden Bezeichner sind so zu übernehmen und werden nicht weiter ersetzt. Profileregistry ist der voll qualifizierte Pfad zur Datei profileRegistry.xml. Nodesdir ist ein Template des Pfades zu Node-Directories. Nodeinfoscript ist der voll qualifizierte Pfad zur Datei getNodeInfo.jacl. Wasadmin ist der erste Teil des Aufrufs von wasadmin, der später durch weitere Parameter ergänzt wird. Acgetnodenames ist ein von wasadmin auszuführendes Kommando, das AppServer abfragt.
+	
+	
+ABHÄNGIGKEITEN
+
+	WAS 6.1. 
+	startAppServer.cmd und stopServer.cmd (Teile der WAS-Scripte)
+	
+FEHLER/WARNUNGEN
+
+	tbd.

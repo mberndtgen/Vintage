@@ -1,0 +1,76 @@
+cmshelper															   cmshelper
+
+NAME
+	cmshelper
+	
+AUFRUF
+	cscript cmshelper.vbs 
+		-u[ser] <username> 
+		-p[assword] <password> 
+		-c[hannel] <channel>
+		[[-]?]
+
+BESCHREIBUNG
+
+	cmshelper stellt für jedes Objekt in und unterhalb von <channel> folgende 
+	Informationen dar: DisplayPath, DisplayName, Name, CreatedDate, Author, 
+	Templatename.
+	cmshelper ist mit den entsprechenden Credentials direkt auf einem MCMS-
+	Server auszuführen.
+	
+	cmshelper befindet sich auf server im Verzeichnis path
+
+	Eine aktuelle Version von cmshelper befindet sich in path
+	
+PARAMETER
+		-u <username>
+			Mit diesem Parameter wird der Username spezifiziert, mittels dessen die
+			Authentifizierung am Server erfolgt.
+		
+		-p <password>
+			Mit diesem Parameter wird das Passwort für die Authentifizierung am
+			Server festgelegt.
+			
+		-c <channel>
+			Channel (inkl. Pfad), ab dem rekursiv Objekte (Container und Postings)
+			ausgelesen werden.
+			
+		[-?]
+			Dieser optionale Parameter führt zur Anzeige der Hilfe mit einer 
+			Übersicht über alle Parameter.
+
+	
+ABHÄNGIGKEITEN
+	cmshelper erfordert Windows NT (oder höher) und den Windows Scripting Host. 
+	Korrekter Ablauf nur bei Zugriff auf einen MCMS-Server und passenden Rechten.
+	
+BEISPIELE
+	Analysiere /Channels/cms/company 
+	cscript cmshelper.vbs -u WinNt://server/Adminuser -p p@ssw0rd 
+			-c /channels/cms/company 
+	
+FEHLER/WARNUNGEN	
+	cmshelper gibt eine Vielzahl von Warnungen und Fehlermeldungen aus, falls
+	Probleme auftauchen. Diese sind i.d.R. selbsterklärend:
+
+	invalid input data (<parameter name>).	
+		Diese Meldung erscheint bei einem Fehler in der Liste übergebener
+		Parameter. Die Ausführung des Programms wird abgebrochen.
+	Export Problem Creating CmsApplicationContext Object
+		Diese Meldung erscheint, falls die MCMS-Komponente
+		"ResolutionObjectModel.CmsApplicationContext.1" nicht referenziert werden kann. 
+		Der Grund erscheint im Anschluß. Die Ausführung des Programms wird 
+		abgebrochen.
+	Export Problem Authenticating the Admin User
+		Diese Meldung erscheint bei fehlgeschlagener Authentifizierung am MCMS-
+		Server. Der Grund erscheint im Anschluß. Die Ausführung des Programms 
+		wird abgebrochen.
+	Root channel <channel> not found.
+		Diese Warnung erscheint bei unzulässiger Belegung eines der Parameter
+		irg, icb, roa oder ror. Der entsprechende Parameter wird auf seinen
+		Defaultwert gesetzt. Die Ausführung des Programms wird fortgesetzt.
+	Could not get channel object (maybe wrong channel path)
+		Diese Meldung erscheint bei fehlgeschlagenem Zugriff auf einen Channel.
+		Der Grund erscheint im Anschluß. Die Ausführung des Programms wird 
+		abgebrochen.
+	

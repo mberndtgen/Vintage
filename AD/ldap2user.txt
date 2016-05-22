@@ -1,0 +1,190 @@
+ldap2user															   ldap2user
+
+NAME
+	ldap2user
+	
+AUFRUF
+	cscript ldap2user.vbs 
+		[-v[erbose]] 
+		[-s[ource] <sourcefile>] 
+		[-o[utputfile]] 
+		[-l[ogfile] <logfilename>] 
+		[-dn <oudn>] 
+		[-do[main] <domaindn>] 
+		[[-]?]
+		
+BESCHREIBUNG
+	ldap2user erzeugt / löscht / bearbeitet AD-Accounts durch Einlesen von mit 
+	excel2ldap aufbereiteten Daten. Die Ausführung von ldap2user erfordert hin-
+	reichende Rechte und Zugriff auf einen AD-Server. Sinnvollerweise führt man
+	ldap2user direkt auf dem AD-Server aus. Die Ausgabe besteht aus einer Text-
+	datei mit den Accountnamen (sAMAccountName) und den Account-Passwörtern:
+	
+	name@domain.es		OKab12qc48
+
+	Das Passwort wird für jeden Benutzer automatisch generiert. Die Art der aus-
+	geführten Aktion wird über den Eintrag "Action" in jeder Zeile der Eingabe-
+	datei festgelegt. Accounts können neu angelegt (Action="N"), gelöscht ("D")
+	oder bearbeitet ("C") werden. Bei der Neuanlage eines Accounts wird der
+	sAMAccountName automatisch aus dem Zunamen des Benutzers generiert.
+	Sollte der automatisch generierte sAMAccuntName bereits existieren, wird 
+	ihm der erste Buchstabe des Vornamens angehängt. Sollte auch dieser neue
+	sAMAccountName bereits präsent sein, so wird sukzessive eine Zahl ange-
+	hängt, die ggfs. inkrementiert wird, bis der sAMAccountName endlich ein-
+	deutig geworden ist. Anschließend wird der userPrincipalName mit dem
+	sAMAccountName synchronisiert.
+	
+	ldap2user befindet sich auf server1, server2, server3 und
+	server4 jeweils im Verzeichnis c:\path.
+	
+	Eine aktuelle Version von ldap2user befindet sich in 
+	\\server\path
+
+PARAMETER
+		[-v] 
+			Dieser optionale Parameter sorgt für eine besonders ausführliche
+			Ausgabe von Programmzwischenschritten nach STDOUT (verbose mode).
+			
+		[-s <sourcefile>]
+			Dieser optionale Parameter legt den Namen der Eingabedatei, wie 
+			sie von excel2ladp erzeugt wurde, fest (Default: input.txt).
+			
+		[-o <outputfile>] 
+			Dieser optionale Parameter legt den Namen der Ausgabedatei mit den
+			Accountnamen und -passwörtern fest (Default: output.txt). Achtung:
+			eine bereits vorhandene Ausgabedatei desselben Namens wird über-
+			schrieben.
+					
+		[-l <logfile>]
+			Dieser optionale Parameter bewirkt das Schreiben sämtlicher 
+			Programmausgaben in die Logdatei <logfile>.
+			
+		[-dn <oudn>] 
+			Dieser optionale Parameter legt den organisatorischen DN fest
+			(Default: ou=Users,OU=COMPANY,OU=Customers,dc=user,
+			dc=domain,dc=company)
+			
+		[-do <domain>]
+			Dieser optionale Parameter legt die Domain fest (Default:
+			LDAP://server/)
+			
+		[-?]
+			Dieser Parameter führt zur Anzeige der Hilfe mit einer Übersicht über
+			alle Parameter.
+
+ABHÄNGIGKEITEN
+	excel2ldap erfordert Windows NT (oder höher) und den Windows Scripting Host. 
+	Korrekter Ablauf nur bei Zugriff auf einen AD-Server und passenden Rechten.
+	
+BEISPIELE
+	Generiere Accounts aus der Eingabedatei input.txt und schreibe die 
+	Ergebnisse nach output.txt.
+	cscript ldap2user.vbs -s input.txt -o output.txt 
+	
+	Generiere Accounts aus der Eingabedatei c:\ein verzeichnis\input.txt und 
+	schreibe die Ergebnisse nach output.txt auf dem Testsystem.
+	cscript ldap2user.vbs 
+		-s "c:\ein verzeichnis\input.txt"
+		-o output.txt 
+		-dn ou=Users,OU=COMPANY,OU=Customers,dc=user,
+			dc=domain,dc=company
+		-do LDAP://server/
+	Man beachte die "" bei Pfaden mit Blanks.
+	
+FEHLER/WARNUNGEN
+	ldap2user gibt eine Vielzahl von Warnungen und Fehlermeldungen aus, falls
+	Probleme auftauchen. Diese sind i.d.R. selbsterklärend:
+	
+	invalid input data (<parameter name>). 
+		Diese Meldung erscheint bei einem Fehler in der Liste übergebener
+		Parameter. Die Ausführung des Programms wird abgebrochen.
+	invalid input data (<filetype>). 
+		Diese Meldung erscheint bei fehlerhafter Angabe einer Eingabe-/
+		Ausgabe-/Log-Datei bzw. fehlerhaften DN- oder DO-Daten. Die Ausführung 
+		des Programms wird abgebrochen.
+	input file does not exist.
+		Diese Meldung erscheint, falls die mit "-s" spezifizierte Input-Datei
+		nicht existiert. Die Ausführung des Programms wird abgebrochen.
+	Can't read input file: <Fehlerursache>
+		Diese Meldung erscheint, falls die Input-Datei nicht gelesen werden
+		kann. Der Grund erscheint im Anschluß. Die Ausführung des Programms 
+		wird abgebrochen.
+	Can't write <Ausgabe-/Logdatei>: <Fehlerursache>
+		Diese Meldung erscheint, falls nicht in die <Ausgabe-/Logdatei> 
+		geschrieben werden kann. Der Grund erscheint im Anschluß. Die 
+		Ausführung des Programms wird abgebrochen.
+	Could not delete user
+		Diese Meldung erscheint, falls ein Account nicht gelöscht werden kann.
+		Die Ausführung des Programms wird nicht abgebrochen, da es sich um 
+		keinen fatalen Fehler handelt.
+	ERROR searching for <UserDN>
+		Diese Meldung erscheint bei einer fehlgeschlagenen LDAP-Suche nach 
+		<UserDN>. Die Ausführung des Programms wird nicht abgebrochen, da es 
+		sich um keinen fatalen Fehler handelt.
+	ERROR updating user: <Fehlerursache>
+		Diese Meldung erscheint bei einem fehlgeschlagenen Update von Benutzer-
+		daten. Die Ausführung des Programms wird nicht abgebrochen, da es 
+		sich um keinen fatalen Fehler handelt; stattdessen wird mit dem nächsten
+		Account fortgefahren.
+	ERROR deleting user from group <group>: <Fehlerursache>
+		Diese Meldung erscheint bei einem fehlgeschlagenen Entfernen eines 
+		Accounts aus einer Benutzergruppe. Die Ausführung des Programms wird 
+		nicht abgebrochen, da es sich um keinen fatalen Fehler handelt; 
+		stattdessen wird mit dem nächsten Account fortgefahren.
+	ERROR: User <sAMAccountName> has incorrect E-mail format 
+		Diese Meldung erscheint bei fehlgeschlagenem Festlegen der E-Mail-
+		Adresse. Die Ausführung des Programms wird nicht abgebrochen, da es 
+		sich um keinen fatalen Fehler handelt; stattdessen wird mit dem 
+		nächsten Account fortgefahren.
+	ERROR creating user: <Fehlerursache>
+		Diese Fehlermeldung erscheint bei fehlgeschlagenem Ab-
+		speichern der Accountdaten. Der Grund erscheint im Anschluß. Die 
+		Ausführung des Programms wird nicht abgebrochen, da es sich um keinen 
+		fatalen Fehler handelt; stattdessen wird mit dem nächsten Account 
+		fortgefahren.
+	ERROR setting password: <Fehlerursache>
+		Diese Fehlermeldung erscheint bei fehlgeschlagenem Ab-
+		speichern des Passworts. Der Grund erscheint im Anschluß. Die 
+		Ausführung des Programms wird nicht abgebrochen, da es sich um keinen 
+		fatalen Fehler handelt; stattdessen wird mit dem nächsten Account 
+		fortgefahren.
+	ERROR putting user into group <group>: <Fehlerursache>
+		Diese Fehlermeldung erscheint bei fehlgeschlagener Auf-
+		nahme des Accounts in die Gruppe <group>. Der Grund erscheint im 
+		Anschluß. Die Ausführung des Programms wird nicht abgebrochen, da es 
+		sich um keinen fatalen Fehler handelt; stattdessen wird mit dem 
+		nächsten Account fortgefahren.
+	ERROR: group <group> does not exist: <Fehlerursache>	
+		Diese Fehlermeldung erscheint bei fehlgeschlagener Auf-
+		nahme des Accounts in die Gruppe <group>, da <group> nicht existiert. 
+		Der Grund erscheint im Anschluß. Die Ausführung des Programms wird 
+		nicht abgebrochen, da es sich um keinen fatalen Fehler handelt; 
+		stattdessen wird mit dem nächsten Account fortgefahren. 
+	AccountNameAlreadyPresent: ERROR getting ABODB.Connection : <Fehlerursache>	
+		Diese Fehlermeldung erscheint, falls das ActiveX-Objekt 
+		ADODB.Connection, das zur Ermittlung eines ggfs. bereits vorhandenen
+		sAMAccountNamen benötigt wird, nicht referenziert werden kann. Die 
+		Ausführung des Programms wird abgebrochen.
+	AccountNameAlreadyPresent: ERROR getting ADODB.Command <Fehlerursache>
+		Diese Fehlermeldung erscheint, falls das ActiveX-Objekt 
+		ADODB.Command, das zur Ermittlung eines ggfs. bereits vorhandenen
+		sAMAccountNamen benötigt wird, nicht referenziert werden kann. Die 
+		Ausführung des Programms wird abgebrochen.
+	AccountNameAlreadyPresent: ERROR getting executing ADODB command : <Ursache>
+		Diese Fehlermeldung erscheint bei fehlerhafter Ausführung eines 
+		ADODB-Kommandos, das zur Ermittlung eines ggfs. bereits vorhandenen
+		sAMAccountNamen benötigt wird, nicht referenziert werden kann. Die 
+		Ausführung des Programms wird abgebrochen.
+	WARNING: Problem with User <username>
+		Dieser Warnhinweis erscheint, falls beim Auslesen von Nutzeraccounts 
+		ein nicht schwerwiegendes Problem aufgetreten ist. Es wird mit dem 
+		nächsten Account fortgefahren.
+		
+	Weitere Fehler, die nicht abgefangen werden, bitte den Autoren melden.
+	
+AUTOR
+	Code, Dokumentation M. Berndtgen, 2005.
+	
+SIEHE AUCH
+	cscript, excel2ldap
+	

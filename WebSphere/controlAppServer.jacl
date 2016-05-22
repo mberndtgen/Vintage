@@ -1,0 +1,21 @@
+if {[llength $argv] <= 4} {
+	set node [lindex $argv 0]
+	set server [lindex $argv 1]
+	set action [lindex $argv 2]
+}
+set option ""
+if {[llength $argv] == 4} {
+	set option [lindex $argv 3]
+}
+
+puts stdout "$action Application Server $server on node $node"
+if {$option != ""} {
+	puts stdout "  with option $option" 
+}
+
+if {$action == "start"} {
+	$AdminControl startServer $server $node
+}
+if {$action == "stop"} {
+	$AdminControl stopServer $server $node $option
+}
